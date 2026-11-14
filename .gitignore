@@ -1,0 +1,9 @@
+/.idea/
+bin/
+obj/
+config/
+/packages/
+riderModule.iml
+node_modules
+/_ReSharper.Caches/
+
