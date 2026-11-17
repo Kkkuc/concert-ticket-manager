@@ -1,15 +1,22 @@
-using Core;
+using Infrastructure.Data;
+using Application.Interfaces;
+using Application.Services;
+using Microsoft.EntityFrameworkCore;
 
-var klasa = new Class1();
-klasa.Test();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+/*var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
@@ -27,10 +34,14 @@ app.MapGet("/weatherforecast", () =>
         return forecast;
     })
     .WithName("GetWeatherForecast");
+*/
 
+app.MapControllers();
 app.Run();
 
+/*
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
+*/
