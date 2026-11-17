@@ -79,7 +79,7 @@ Due to Windows enforcing localhost, you can access our services here:
   - Backend: `http://192.168.25.100:3000`
   - Database `postgres://192.168.25.150:5432`
 
-or here:
+if not, they will be here
 
   - Frontend: `http://localhost:5000`
   - Backend: `http://localhost:3000`
@@ -167,7 +167,7 @@ Przez windowsa i jego wymuszanie localhosta możemy znaleźć nasze serwisy tuta
   - Backend: `http://192.168.25.100:3000`
   - Database `postgres://192.168.25.150:5432`
 
-lub tutaj
+ a jeżeli się nie da to tutaj
 
   - Frontend: `http://localhost:5000`
   - Backend: `http://localhost:3000`
