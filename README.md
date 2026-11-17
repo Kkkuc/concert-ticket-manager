@@ -1,6 +1,12 @@
 # concert-ticket-manager
 App for team project
 
+remember to use
+```bash
+dotnet restore
+```
+(rider does it automaticly)
+Migration how to is in `Infrastructure/README.md`
 
 # Connection to database (Polish version below)
 
@@ -111,14 +117,14 @@ Można albo pracować full na dockerze nie polecam bo trzeba po każdej zmianie 
 docker compose restart backend
 ```
 
-ewentualnie jak tak chcecie to można dopisać flagę "watch" w ENTRYPOINT w API/DockerFile
+ewentualnie jak tak chcecie to można dopisać flagę "watch" w ENTRYPOINT w `API/DockerFile`
 ```API/Dockerfile
 ENTRYPOINT ["dotnet", "watch", "run", "itp"]
 ```
 
 Jest 3cia opcja czyli praca z backendem przez środowisko i do niej trzeba skonfigurować connectionstringa
 
-### 4. Praca przez środowisko appsettings.Development.json
+### 4. Praca przez środowisko `appsettings.Development.json`
 
 Można zedytować plik powyżej wymieniony tylko nie dodawać go na gita!
 
