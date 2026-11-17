@@ -1,0 +1,86 @@
+﻿services:
+  frontend:
+    container_name: concert_frontend
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    build:
+      context: ./client/
+      dockerfile: ./Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on: [backend]
+    networks:
+      concert_net:
+        ipv4_address: 192.168.26.50
+
+  backend:
+    env_file:
+      - .env
+    container_name: concert_backend
+    volumes:
+      - ./API:/src/API
+      - ./Core:/src/Core
+      - /src/API/bin
+      - /src/API/obj
+      - /src/Core/bin
+      - /src/Core/obj
+    build:
+      context: .
+      dockerfile: ./API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - HTTP_PORTS=3000
+      # do watcha
+      #- DOTNET_USE_POLLING_FILE_WATCHER=1
+      - ConnectionStrings__DefaultConnection=Host=database;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    networks:
+      concert_net:
+        ipv4_address: 192.168.26.100
+  
+  database:
+    container_name: concert_database
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    volumes:
+      - concert_db_data:/var/lib/postgresql/data
+    environment:
+      PGDATA: "/var/lib/postgresql/data"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGUSER: ${POSTGRES_USER}
+    networks:
+      concert_net:
+        ipv4_address: 192.168.26.150
+    healthcheck:
+      test: pg_isready -d ${POSTGRES_DB}
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
+  
+  networker:
+    container_name: concert_networker
+    image: jonlabelle/network-tools:latest
+    command: "sleep 3600"
+    networks:
+      concert_net:
+        ipv4_address: 192.168.26.151
+
+volumes:
+  concert_db_data:
+
+networks:
+  concert_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.26.0/24
+          gateway: 192.168.26.1
