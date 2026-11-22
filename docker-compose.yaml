@@ -7,6 +7,8 @@
     build:
       context: ./client/
       dockerfile: ./Dockerfile
+    environment:
+      - VITE_API_URL=http://backend:3000
     ports:
       - "5000:5000"
     depends_on: [backend]
@@ -20,11 +22,17 @@
     container_name: concert_backend
     volumes:
       - ./API:/src/API
-      - ./Core:/src/Core
+      - ./Application:/src/Application
+      - ./Domain:/src/Domain
+      - ./Infrastructure:/src/Infrastructure
       - /src/API/bin
       - /src/API/obj
-      - /src/Core/bin
-      - /src/Core/obj
+      - /src/Application/bin
+      - /src/Application/obj
+      - /src/Domain/bin
+      - /src/Domain/obj
+      - /src/Infrastructure/bin
+      - /src/Infrastructure/obj
     build:
       context: .
       dockerfile: ./API/Dockerfile

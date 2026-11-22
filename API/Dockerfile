@@ -1,13 +1,14 @@
 ﻿FROM mcr.microsoft.com/dotnet/sdk:10.0
 WORKDIR /src
 
-COPY API/API.csproj ./API/
-COPY Core/Core.csproj ./Core/
+COPY ["API/API.csproj", "API/"]
+COPY ["Application/Application.csproj", "Application/"]
+COPY ["Infrastructure/Infrastructure.csproj", "Infrastructure/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
 
 RUN dotnet restore ./API/API.csproj
 
-COPY API/ ./API/
-COPY Core/ ./Core/
+COPY . .
 
 WORKDIR /src/API
 
