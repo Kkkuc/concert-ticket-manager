@@ -6,6 +6,10 @@ using Application.Validation;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 var passwordHasher = new PasswordHasher<User>();
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +20,30 @@ builder.Services.AddScoped<IHomeService, HomeService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+var jwtKey = Convert.FromBase64String(
+    builder.Configuration["Jwt:Key"]
+    ?? throw new Exception("Brak klucza JWT"));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = "concert-ticket-manager",
+
+            ValidateAudience = true,
+            ValidAudience = "concert-ticket-manager-client",
+
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(jwtKey)
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -93,8 +121,31 @@ app.MapPost("/api/auth/login", async (HttpRequest request, AppDbContext db) =>
             statusCode: 401);
     }
 
-    return Results.Ok();
+    var claims = new[]
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim(ClaimTypes.Role, user.Role)
+    };
+
+        var token = new JwtSecurityToken(
+            issuer: "concert-ticket-manager",
+            audience: "concert-ticket-manager-client",
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(1),
+            signingCredentials: new SigningCredentials(
+                new SymmetricSecurityKey(jwtKey),
+                SecurityAlgorithms.HmacSha256)
+        );
+
+    return Results.Ok(new
+    {
+        token = new JwtSecurityTokenHandler().WriteToken(token)
+    });
 });
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
