@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logowanie i rejestracja</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="/script.js?v=2" defer></script>
+</head>
+<body>
+    <main>
+        <h1>System obsługi koncertów</h1>
+
+        <div class="auth-tabs">
+            <input type="radio" name="tab" id="register-tab" checked>
+            <input type="radio" name="tab" id="login-tab">
+
+            <div class="tab-buttons">
+                <label for="register-tab">Rejestracja</label>
+                <label for="login-tab">Logowanie</label>
+            </div>
+
+            <section id="register-panel">
+                <h2>Rejestracja</h2>
+
+                <form id="register-form"
+                      action="/api/auth/register"
+                      method="post"
+                      novalidate
+                      onsubmit="registerUser(event, this)">
+
+                    <label for="first-name">Imię</label>
+                    <input id="first-name" name="first_name" type="text">
+
+                    <label for="last-name">Nazwisko</label>
+                    <input id="last-name" name="last_name" type="text">
+
+                    <label for="register-email">E-mail</label>
+                    <input id="register-email" name="email" type="email">
+
+                    <label for="phone">Telefon (opcjonalnie)</label>
+                    <input id="phone" name="phone_number" type="tel">
+
+                    <label for="register-password">Hasło</label>
+                    <input id="register-password" name="password" type="password">
+
+                    <label for="confirm-password">Powtórz hasło</label>
+                    <input id="confirm-password" name="confirm_password" type="password">
+
+                    <button type="submit">Załóż konto</button>
+                </form>
+            </section>
+
+            <section id="login-panel">
+                <h2>Logowanie</h2>
+
+                <form id="login-form"
+                      action="/api/auth/login"
+                      method="post"
+                      novalidate
+                      onsubmit="loginUser(event, this)">
+
+                    <label for="login-email">E-mail</label>
+                    <input id="login-email" name="email" type="email">
+
+                    <label for="login-password">Hasło</label>
+                    <input id="login-password" name="password" type="password">
+
+                    <button type="submit">Zaloguj się</button>
+                </form>
+            </section>
+        </div>
+    </main>
+</body>
+</html>
