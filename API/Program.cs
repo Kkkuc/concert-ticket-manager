@@ -5,10 +5,12 @@ using Application.DTOs;
 using Application.Validation;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
+var passwordHasher = new PasswordHasher<User>();
 var builder = WebApplication.CreateBuilder(args);
 
-// Istniejąca konfiguracja zespołu
+
 builder.Services.AddControllers();
 builder.Services.AddScoped<IHomeService, HomeService>();
 
@@ -62,11 +64,12 @@ app.MapPost("/api/auth/register", async (HttpRequest request, AppDbContext db) =
         Email = email,
         PhoneNumber = string.IsNullOrWhiteSpace(user.PhoneNumber)
             ? null : user.PhoneNumber,
-        PasswordHash = user.Password,
+        PasswordHash = string.Empty,
         Role = "USER",
         CreatedAt = DateTime.UtcNow
     };
 
+    newUser.PasswordHash = passwordHasher.HashPassword(newUser, user.Password);
     db.Users.Add(newUser);
     await db.SaveChangesAsync();
 
@@ -83,7 +86,7 @@ app.MapPost("/api/auth/login", async (HttpRequest request, AppDbContext db) =>
 
     var user = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
 
-    if (user == null || user.PasswordHash != password)
+    if (user == null || passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password) == PasswordVerificationResult.Failed)
     {
         return Results.Json(
             new { error = "Nieprawidłowy e-mail lub hasło." },
@@ -93,7 +96,6 @@ app.MapPost("/api/auth/login", async (HttpRequest request, AppDbContext db) =>
     return Results.Ok();
 });
 
-// Zachowujemy kontrolery zespołu
 app.MapControllers();
 
 app.Run();
